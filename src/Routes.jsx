@@ -16,7 +16,7 @@ import NotFound from './pages/NotFound';
 import ClientLayout from './pages/client/ClientLayout';
 import ClientDashboard from './pages/client/Dashboard';
 import ClientProjects from './pages/client/Projects';
-import ClientProjectDetail from './pages/client/ProjectDetail';
+// Remove ProjectDetail import - it doesn't exist yet
 import ClientInvoices from './pages/client/Invoices';
 import ClientSupport from './pages/client/Support';
 import ClientProfile from './pages/client/Profile';
@@ -55,7 +55,7 @@ const Routes = ({ session }) => {
           }>
             <Route index element={<ClientDashboard />} />
             <Route path="projects" element={<ClientProjects />} />
-            <Route path="projects/:id" element={<ClientProjectDetail />} />
+            {/* Remove ProjectDetail route for now */}
             <Route path="invoices" element={<ClientInvoices />} />
             <Route path="support" element={<ClientSupport />} />
             <Route path="profile" element={<ClientProfile />} />
