@@ -11,11 +11,11 @@ const ClientLayout = ({ userProfile, setUserProfile }) => {
   const navigate = useNavigate();
 
   const navigation = [
-    { name: 'Dashboard', path: '/client', icon: 'LayoutDashboard' },
-    { name: 'Projects', path: '/client/projects', icon: 'Briefcase' },
-    { name: 'Invoices', path: '/client/invoices', icon: 'FileText' },
-    { name: 'Support', path: '/client/support', icon: 'MessageCircle' },
-    { name: 'Profile', path: '/client/profile', icon: 'User' },
+    { name: 'Dashboard', path: '/', icon: 'LayoutDashboard' },
+    { name: 'Projects', path: '/projects', icon: 'Briefcase' },
+    { name: 'Invoices', path: '/invoices', icon: 'FileText' },
+    { name: 'Support', path: '/support', icon: 'MessageCircle' },
+    { name: 'Profile', path: '/profile', icon: 'User' },
   ];
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const ClientLayout = ({ userProfile, setUserProfile }) => {
               >
                 <Icon name={mobileMenuOpen ? 'X' : 'Menu'} size={24} />
               </button>
-              <Link to="/client" className="flex items-center space-x-3">
+              <Link to="/" className="flex items-center space-x-3">
                 <img 
                   src="/assets/Logo/rule27-icon-color.png" 
                   alt="Rule27" 
