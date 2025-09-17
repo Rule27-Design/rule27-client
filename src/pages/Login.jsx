@@ -1,4 +1,4 @@
-// src/pages/Login.jsx
+// src/pages/Login.jsx - Client Portal Version
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -84,28 +84,17 @@ const Login = () => {
       .single();
 
     if (profile) {
-      // Check onboarding first - route to appropriate setup based on role
-      if (!profile.onboarding_completed) {
-        if (profile.role === 'standard') {
-          navigate('/client/setup-profile');
-        } else {
-          navigate('/admin/setup-profile');
-        }
+      // Check if user is not a client - redirect to admin portal
+      if (profile.role !== 'standard') {
+        window.location.href = 'https://admin.rule27design.com';
         return;
       }
 
-      // Route based on role after onboarding
-      switch (profile.role) {
-        case 'admin':
-        case 'contributor':
-        case 'client_manager':
-          navigate('/admin');
-          break;
-        case 'standard':
-          navigate('/client');
-          break;
-        default:
-          navigate('/');
+      // Client user - check onboarding
+      if (!profile.onboarding_completed) {
+        navigate('/setup-profile');
+      } else {
+        navigate('/');
       }
     }
   };
@@ -190,7 +179,6 @@ const Login = () => {
       }
 
       // Now create profile - check if it already exists first
-      // FIX: Use maybeSingle() instead of single()
       const { data: existingProfile, error: profileCheckError } = await supabase
         .from('profiles')
         .select('id, role')
@@ -232,10 +220,9 @@ const Login = () => {
         profileData = newProfile;
       }
 
-      // Create clients record ONLY for standard role users
-      if (profileData && profileData.role === 'standard') {
+      // Create clients record
+      if (profileData) {
         // Check if client record already exists
-        // FIX: Use maybeSingle() instead of single()
         const { data: existingClient, error: clientCheckError } = await supabase
           .from('clients')
           .select('id')
@@ -266,7 +253,6 @@ const Login = () => {
 
           if (clientError) {
             console.error('Client record creation error:', clientError);
-            // Don't throw - profile was created successfully
           }
         }
       }
@@ -285,13 +271,9 @@ const Login = () => {
 
       setSuccess('Account created successfully! Redirecting...');
       
-      // Route to appropriate setup based on role
+      // Route to setup
       setTimeout(() => {
-        if (profileData.role === 'standard') {
-          navigate('/client/setup-profile');
-        } else {
-          navigate('/admin/setup-profile');
-        }
+        navigate('/setup-profile');
       }, 2000);
       
     } catch (error) {
@@ -367,10 +349,9 @@ const Login = () => {
         }}
       />
 
-      {/* Animated Background */}
+      {/* Animated Background - KEEP ALL OF THIS SAME */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
-          {/* Gradient Mesh */}
           <div className="absolute inset-0 opacity-30">
             <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-radial from-accent/20 to-transparent blur-3xl"></div>
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-radial from-accent/10 to-transparent blur-3xl"></div>
@@ -389,12 +370,10 @@ const Login = () => {
           </div>
         </div>
         
-        {/* Grid Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="h-full w-full bg-[linear-gradient(to_right,#4f4f4f_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
         </div>
 
-        {/* Floating Particles */}
         <FloatingParticles />
       </div>
 
@@ -417,7 +396,6 @@ const Login = () => {
               <Logo 
                 variant="icon"
                 colorScheme="white"
-                linkTo="/"
                 className="transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
               />
               <motion.div 
@@ -434,17 +412,17 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-4xl font-heading-bold text-white uppercase tracking-wider">
-            {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
+            {mode === 'signup' ? 'Create Account' : 'Client Portal'}
           </h1>
           <p className="text-gray-400 mt-2 font-sans">
             {mode === 'signup' 
               ? invitationData ? `Complete your registration for ${invitationData.metadata?.company_name || 'Rule27 Design'}` : 'Set up your account'
-              : 'Enter your credentials to access your account'
+              : 'Enter your credentials to access your dashboard'
             }
           </p>
         </motion.div>
 
-        {/* Login/Signup Form */}
+        {/* KEEP ALL FORM CODE THE SAME */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -497,7 +475,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  disabled={!!invitationToken} // Disable if from invitation
+                  disabled={!!invitationToken}
                   className="w-full bg-white/10 border-white/20 text-white placeholder-gray-500 disabled:opacity-50"
                   labelClassName="text-gray-300"
                 />
@@ -708,13 +686,13 @@ const Login = () => {
           {mode === 'login' && (
             <div className="mt-8 pt-6 border-t border-white/10 text-center">
               <p className="text-gray-400 text-sm font-sans">
-                Need an account?{' '}
-                <Link 
-                  to="/contact" 
+                Team member?{' '}
+                <a 
+                  href="https://admin.rule27design.com" 
                   className="text-accent hover:text-red-400 transition-colors font-medium"
                 >
-                  Contact Us
-                </Link>
+                  Admin Login
+                </a>
               </p>
             </div>
           )}
@@ -728,27 +706,20 @@ const Login = () => {
           className="mt-8 text-center"
         >
           <div className="flex justify-center space-x-6 text-sm">
-            <Link 
-              to="/" 
+            <a 
+              href="https://www.rule27design.com" 
               className="text-gray-400 hover:text-accent transition-colors flex items-center space-x-1"
             >
               <Icon name="Home" size={14} />
-              <span>Home</span>
-            </Link>
-            <Link 
-              to="/about" 
-              className="text-gray-400 hover:text-accent transition-colors flex items-center space-x-1"
-            >
-              <Icon name="Info" size={14} />
-              <span>About</span>
-            </Link>
-            <Link 
-              to="/contact" 
+              <span>Main Site</span>
+            </a>
+            <a 
+              href="https://www.rule27design.com/contact" 
               className="text-gray-400 hover:text-accent transition-colors flex items-center space-x-1"
             >
               <Icon name="MessageCircle" size={14} />
               <span>Support</span>
-            </Link>
+            </a>
           </div>
         </motion.div>
       </div>

@@ -1,10 +1,9 @@
-// src/components/ProtectedRoute.jsx
+// src/components/ProtectedRoute.jsx - Client Portal Version
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import Icon from './AppIcon';
 
-const ProtectedRoute = ({ children, session, requiredRoles = [] }) => {
+const ProtectedRoute = ({ children, session, requiredRoles = ['standard'] }) => {
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
@@ -48,25 +47,19 @@ const ProtectedRoute = ({ children, session, requiredRoles = [] }) => {
       setUserProfile(profile);
       setUserRole(profile.role);
 
-      // Check if user's role matches required roles
-      if (requiredRoles.length > 0) {
-        // If specific roles are required, check if user has one of them
-        const hasRequiredRole = requiredRoles.includes(profile.role);
-        setAuthorized(hasRequiredRole);
-      } else {
-        // If no specific roles required (backward compatibility)
-        // Default to admin, contributor, and client_manager for admin routes
-        const adminRoles = ['admin', 'contributor', 'client_manager'];
-        setAuthorized(adminRoles.includes(profile.role));
+      // Client portal only allows 'standard' role
+      if (profile.role !== 'standard') {
+        // Non-client users should go to admin portal
+        setAuthorized(false);
+        window.location.href = 'https://admin.rule27design.com';
+        return;
       }
 
       // Check if onboarding is completed (unless on setup-profile page)
       if (!profile.onboarding_completed && !window.location.pathname.includes('setup-profile')) {
-        console.log('Profile onboarding not completed');
-        // Don't block access to setup-profile page
-        if (!window.location.pathname.includes('setup-profile')) {
-          setAuthorized(false);
-        }
+        setAuthorized(false);
+      } else {
+        setAuthorized(true);
       }
     } catch (error) {
       console.error('Authorization error:', error);
@@ -92,21 +85,9 @@ const ProtectedRoute = ({ children, session, requiredRoles = [] }) => {
     if (!session) {
       // No session - go to login
       return <Navigate to="/login" replace />;
-    } else if (userRole === 'standard') {
-      // Standard users trying to access admin - redirect to client portal
-      return <Navigate to="/client" replace />;
-    } else if (userRole && !requiredRoles.includes(userRole)) {
-      // User has a role but not the required one
-      if (userRole === 'admin' || userRole === 'contributor' || userRole === 'client_manager') {
-        // Admin users without access to specific area
-        return <Navigate to="/admin" replace />;
-      } else {
-        // Other users - go home
-        return <Navigate to="/" replace />;
-      }
     } else if (!userProfile?.onboarding_completed) {
       // Onboarding not complete
-      return <Navigate to="/admin/setup-profile" replace />;
+      return <Navigate to="/setup-profile" replace />;
     } else {
       // Default to login
       return <Navigate to="/login" replace />;

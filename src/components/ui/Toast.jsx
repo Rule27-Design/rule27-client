@@ -1,6 +1,6 @@
 // src/components/ui/Toast.jsx
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import Icon from '../AdminIcon';
+import Icon from '../AppIcon';
 
 const ToastContext = createContext();
 

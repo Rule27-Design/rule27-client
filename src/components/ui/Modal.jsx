@@ -1,6 +1,6 @@
 // src/components/ui/Modal.jsx
 import React, { useEffect } from 'react';
-import Icon from '../AdminIcon';
+import Icon from '../AppIcon';
 
 const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   // Close on escape key

@@ -1,9 +1,9 @@
-// src/components/AdminIcon.jsx
+// src/components/AppIcon.jsx
 import React from 'react';
 import SafeIcon from './SafeIcon';
 
-const AdminIcon = (props) => {
+const AppIcon = (props) => {
   return <SafeIcon {...props} />;
 };
 
-export default AdminIcon;
+export default AppIcon;

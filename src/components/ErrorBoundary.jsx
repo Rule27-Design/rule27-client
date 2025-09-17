@@ -1,6 +1,6 @@
 // src/components/ErrorBoundary.jsx - Enhanced version with EventBus integration
 import React from 'react';
-import Icon from './AdminIcon';
+import Icon from './AppIcon';
 import Button from './ui/Button';
 import { globalEventBus } from '../services/EventBus';
 
