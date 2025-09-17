@@ -1,8 +1,8 @@
-// src/pages/auth/AuthCallback.jsx
+// src/pages/AuthCallback.jsx - Client Portal Version
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
-import Icon from '../../components/AppIcon';
+import { supabase } from '../lib/supabase';
+import Icon from '../components/AppIcon';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -66,24 +66,7 @@ const AuthCallback = () => {
           
           if (createError) {
             console.error('Profile creation error:', createError);
-            // Try to fetch again in case it exists
-            const { data: existingProfile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('email', session.user.email)
-              .single();
-            
-            if (existingProfile) {
-              // Update it to link with auth
-              await supabase
-                .from('profiles')
-                .update({ auth_user_id: session.user.id })
-                .eq('id', existingProfile.id);
-              
-              await handleNavigation(session, existingProfile);
-            } else {
-              throw new Error('Failed to create user profile');
-            }
+            throw new Error('Failed to create user profile');
           } else {
             await handleNavigation(session, newProfile);
           }
@@ -92,12 +75,12 @@ const AuthCallback = () => {
         }
       } else {
         console.log('No session found, redirecting to login');
-        navigate('/login'); // Changed from '/admin/login'
+        navigate('/login');
       }
     } catch (error) {
       console.error('Auth callback error:', error);
       setError(error.message || 'Authentication failed');
-      setTimeout(() => navigate('/login'), 3000); // Changed from '/admin/login'
+      setTimeout(() => navigate('/login'), 3000);
     } finally {
       setLoading(false);
     }
@@ -106,48 +89,25 @@ const AuthCallback = () => {
   const handleNavigation = async (session, profile) => {
     setStatus('Redirecting...');
     
-    // Get user metadata
-    const userData = session.user.user_metadata;
-    
-    // FLOW LOGIC:
-    // 1. First check if password needs to be set (ALWAYS FIRST for new users)
-    // 2. Then check if profile needs completion
-    // 3. Route based on role: admin/contributor -> /admin, standard -> /client
-    
-    const hasPassword = userData?.has_password === true;
-    const isFirstLogin = userData?.first_login !== false;
-    const profileCompleted = profile.onboarding_completed === true;
-    
     console.log('Navigation decision:', {
-      hasPassword,
-      isFirstLogin,
-      profileCompleted,
+      profileCompleted: profile.onboarding_completed,
       role: profile.role
     });
     
-    // STEP 1: Password setup (for invited users who haven't set password)
-    if (!hasPassword && isFirstLogin) {
-      console.log('Redirecting to password setup');
-      navigate('/admin/setup-profile?step=password');
+    // Client portal only handles standard users
+    if (profile.role !== 'standard') {
+      // Non-client users go to admin portal
+      console.log('Non-client user, redirecting to admin portal');
+      window.location.href = 'https://admin.rule27design.com';
+      return;
     }
-    // STEP 2: Profile setup (if password is set but profile not complete)
-    else if (!profileCompleted) {
+    
+    // Check if profile needs completion
+    if (!profile.onboarding_completed) {
       console.log('Redirecting to profile setup');
-      navigate('/admin/setup-profile?step=profile');
-    }
-    // STEP 3: Route based on role
-    else if (profile.role === 'admin' || profile.role === 'contributor') {
-      console.log('Redirecting to admin dashboard');
-      navigate('/admin');
-    }
-    // STEP 4: Standard users go to client portal
-    else if (profile.role === 'standard') {
-      console.log('Redirecting to client portal');
-      navigate('/client');
-    }
-    // STEP 5: Unknown role - redirect to home
-    else {
-      console.log('Unknown role, redirecting to home');
+      navigate('/setup-profile');
+    } else {
+      console.log('Redirecting to client dashboard');
       navigate('/');
     }
   };

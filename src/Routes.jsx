@@ -4,11 +4,12 @@ import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from "react-ro
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
 
-// Auth Pages
+// Auth Pages - all in pages folder now
 import Login from './pages/Login';
 import AcceptInvite from './pages/AcceptInvite';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import AuthCallback from './pages/AuthCallback';  // Simplified path
 import NoAccess from './pages/NoAccess';
 import NotFound from './pages/NotFound';
 
@@ -16,7 +17,6 @@ import NotFound from './pages/NotFound';
 import ClientLayout from './pages/client/ClientLayout';
 import ClientDashboard from './pages/client/Dashboard';
 import ClientProjects from './pages/client/Projects';
-// Remove ProjectDetail import - it doesn't exist yet
 import ClientInvoices from './pages/client/Invoices';
 import ClientSupport from './pages/client/Support';
 import ClientProfile from './pages/client/Profile';
@@ -24,7 +24,6 @@ import ClientSetupProfile from './pages/client/ClientSetupProfile';
 
 // Utils
 import ProtectedRoute from './components/ProtectedRoute';
-import AuthCallback from './components/AuthCallback';
 
 const Routes = ({ session }) => {
   return (
@@ -55,7 +54,6 @@ const Routes = ({ session }) => {
           }>
             <Route index element={<ClientDashboard />} />
             <Route path="projects" element={<ClientProjects />} />
-            {/* Remove ProjectDetail route for now */}
             <Route path="invoices" element={<ClientInvoices />} />
             <Route path="support" element={<ClientSupport />} />
             <Route path="profile" element={<ClientProfile />} />
